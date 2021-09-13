@@ -4,6 +4,8 @@
 #include <list>
 #include <iostream>
 #include <cstdlib>
+#include <algorithm>
+
 using namespace std;
 
 class Course {
@@ -127,10 +129,11 @@ list <string> parseClasses(string classes) {
 list <string> promptEntry(string subject) {
 	cout << "Please Enter all " << subject << " Courses you have taken (In format \"31,M51,33\" etc., or NONE)\n";
 
-	string Courses = "";
+	string Courses;
 	int CourseAmt = 0;
 	list <int> commaPos;
-	cin >> Courses;
+	getline(cin, Courses);
+	Courses.erase(std::remove(Courses.begin(), Courses.end(), ' '), Courses.end());
 
 	if (Courses == "NONE")
 		exit(0);
