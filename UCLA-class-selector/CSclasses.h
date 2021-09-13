@@ -132,11 +132,12 @@ list <string> promptEntry(string subject) {
 	string Courses;
 	int CourseAmt = 0;
 	list <int> commaPos;
+	list <string> returnList;
 	getline(cin, Courses);
 	Courses.erase(std::remove(Courses.begin(), Courses.end(), ' '), Courses.end());
 
 	if (Courses == "NONE")
-		exit(0);
+		return returnList;
 
 	if (Courses.length() != 0)
 		CourseAmt = 1;
@@ -160,7 +161,6 @@ list <string> promptEntry(string subject) {
 	}
 
 	CourseStr.push_back(Courses.substr(prev, Courses.length()));
-	list <string> returnList;
 	cout << "\nLet's see... so far you have taken " << CourseAmt << " " << subject << " class(es), the following:\n";
 
 	while (!CourseStr.empty()) {
@@ -174,6 +174,10 @@ list <string> promptEntry(string subject) {
 }
 
 bool PreReqMet(Course potentialCourse, list <Course> taken) {
+
+	if (potentialCourse.preReqAmt == 0) {
+		return true;
+	}
 
 	list <string> classList = parseClasses(potentialCourse.preReqs);
 	list <string>::iterator it;
