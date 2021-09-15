@@ -2,6 +2,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
@@ -31,7 +32,7 @@ class Course {
 		}
 };
 
-list <Course> Classes() {
+list <Course> getRequiredClasses() {
 	list <Course> csList;
 	//CS Courses
 	csList.push_back(Course("CS", "1", "", 0));
@@ -91,6 +92,30 @@ list <Course> Classes() {
 
 
 	return csList;
+}
+
+list <Course> getElectiveClasses() {
+	list <Course> electiveList;
+	electiveList.push_back(Course("CS", "CM121", "CS32,STATS100A", 2));
+	electiveList.push_back(Course("CS", "CM122", "CS32,STATS100A", 2));
+	electiveList.push_back(Course("CS", "CM124", "CS32,MATH33A,STATS100A", 3));
+	electiveList.push_back(Course("CS", "133", "CS131,CSM151B", 2));
+	electiveList.push_back(Course("CS", "134", "CS118", 1));
+	electiveList.push_back(Course("CS", "136", "CS118", 1));
+	electiveList.push_back(Course("CS", "143", "CS32", 1));
+	electiveList.push_back(Course("CS", "145", "CS143", 1));
+	electiveList.push_back(Course("CS", "M146", "CS33,STATS100A", 2));
+	electiveList.push_back(Course("CS", "M148", "CS31,STATS100A", 2));
+	electiveList.push_back(Course("CS", "M152B", "CSM51A", 1));
+	electiveList.push_back(Course("CS", "161", "CS180", 1));
+	electiveList.push_back(Course("CS", "174A", "CS32", 1));
+	electiveList.push_back(Course("CS", "C174C", "CS174A", 1));
+	electiveList.push_back(Course("CS", "M182", "MATH31A,MATH31B", 2));
+	electiveList.push_back(Course("CS", "183", "CS180", 1));
+	electiveList.push_back(Course("CS", "M184", "CS31,MATH31B", 2));
+	electiveList.push_back(Course("CS", "CM186", "MATH32A,MATH33A,MATH33B", 3));
+	
+	return electiveList;
 }
 
 list <string> parseClasses(string classes) {
@@ -173,27 +198,38 @@ list <string> promptEntry(string subject) {
 	return returnList;
 }
 
-bool PreReqMet(Course potentialCourse, list <Course> taken) {
+bool promptStatsRequirement() {
+	cout << "Have you fulfilled your stats requirement by taking one of (STATS 100A/MATH 170A/MATH 170E/EC ENG 131A/CEE 110)? [y/N]" << endl;
+	
+	string answer;
+	getline(cin, answer);
+	if (answer.length() == 0)
+		return false;
+	else if (answer[0] == 'Y' || answer[0] == 'y')
+		return true;
+	
+	return false;
+}
+
+bool PreReqMet(Course potentialCourse, list<string> taken) {
 
 	if (potentialCourse.preReqAmt == 0) {
 		return true;
 	}
 
-	list <string> classList = parseClasses(potentialCourse.preReqs);
+	list <string> prereqList = parseClasses(potentialCourse.preReqs);
 	list <string>::iterator it;
-	list <Course>::iterator takenIt;
-	bool reqMet = false;
 
-	for (it = classList.begin(); it != classList.end(); it++) {
-		reqMet = false;
+	for (it = prereqList.begin(); it != prereqList.end(); it++) {
+		bool reqMet = false;
 
-		for (takenIt = taken.begin(); takenIt != taken.end(); takenIt++) {
-			if (*it == (*takenIt).subject + (*takenIt).courseNum) {
-
+		for (string takenCourse : taken) {
+			if (*it == takenCourse) {
 				reqMet = true;
 				break;
 			}
 		}
+		
 		if (!reqMet)
 			return false;
 	}
@@ -226,7 +262,7 @@ list <list <Course>> checkCourses(list <string> classesTaken, list <Course> clas
 	}
 
 	for (poolIt = classPool.begin(); poolIt != classPool.end(); poolIt++) {
-		if (PreReqMet(*poolIt, taken))
+		if (PreReqMet(*poolIt, classesTaken))
 			available.push_back(*poolIt);
 		else
 			preReqNeeded.push_back(*poolIt);
